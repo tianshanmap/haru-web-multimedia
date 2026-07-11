@@ -11,13 +11,21 @@
 #include "haru_service.h"
 
 namespace haru {
+    inline void handle_frame(cv::Mat *frame,httplib::Response& res) {
+        std::vector<uchar> image_data;
+        convertImage(*frame,image_data);
+        delete frame;
+        std::string s(image_data.begin(), image_data.end());
+        res.set_header("Access-Control-Allow-Origin", "*");
+        res.set_content(s, "image/jpeg");
+    };
     int webMain(YamlConfig &config)
     {
         // std::cout is used to print text to the console
         SimpleLogger &logger = SimpleLogger::getInstance();
         logger.info("Web application is listening at ",config.host,config.port,"...");
         httplib::Server http_server;
-        HaruHttpServer svr(&http_server);
+        HaruHttpServer svr(&http_server,config);
 
         // 1. Handle the CORS Preflight (OPTIONS request)
         svr.Options(R"(/.*)", [](const httplib::Request& req, httplib::Response&res) {
@@ -447,6 +455,12 @@ namespace haru {
             res.set_header("Access-Control-Allow-Origin", "*");
             res.set_content(s, "application/json"); });
 
+        svr.Get("/filesystem/upload_target_path", [config](const auto &req, auto &res)
+                {
+            std::string content_type = "text/html";
+            // Allow requests from any frontend origin
+            res.set_header("Access-Control-Allow-Origin", "*");
+            res.set_content(get_upload_target_path(config), content_type); });
         svr.Get("/filesystem/video/audio_list", [config](const auto &req, auto &res)
                 {
             std::string audio_path = config.media_audio_path;
@@ -470,33 +484,6 @@ namespace haru {
             // Allow requests from any frontend origin
             res.set_header("Access-Control-Allow-Origin", "*");
             res.set_content(s, "application/json"); });
-        svr.Post("/filesystem/video/generate", [config](const auto &req, auto &res)
-                {
-            if (req.has_header("Content-Type") && req.get_header_value("Content-Type") != "application/json") {
-                res.status = 400;
-                res.set_content(R"({"error": "Content-Type must be application/json"})", "application/json");
-                return;
-            }
-            VideoCreateRequest video_create_request = get_video_create_request(req);
-            std::cout << "video_create_request(image_path)=" << video_create_request.image_path << std::endl;
-            std::cout << "video_create_request(video_name)=" << video_create_request.video_name << std::endl;
-            std::cout << "video_export=" << config.media_video_export << std::endl;
-            if (!video_create_request.audio_files.empty()) {
-                for (auto audio_file : video_create_request.audio_files) {
-                    std::cout << "audio_file=" << audio_file << std::endl;
-                }
-            };
-            std::string audio_path = config.media_audio_path;
-            std::string audio_workspace_path = config.media_audio_workspace;
-            std::string mp3_name = concatenate_mp3(audio_workspace_path, video_create_request.audio_files);
-            std::string video_export = config.media_video_export + "/" + video_create_request.video_name + ".mp4";
-            std::string response = harusvc::create_video(video_create_request.image_path,
-                mp3_name,
-                video_export);
-            std::string s = get_folder_as_json(config.media_video_export);
-            // Allow requests from any frontend origin
-            res.set_header("Access-Control-Allow-Origin", "*");
-            res.set_content(response, "application/json"); });
         svr.Post("/filesystem/video/generate/v1", [config](const auto &req, auto &res)
                 {
             std::cout << "/filesystem/video/generate/v1 called" << std::endl;
@@ -548,6 +535,68 @@ namespace haru {
             // Allow requests from any frontend origin
             res.set_header("Access-Control-Allow-Origin", "*");
             res.set_content(s, "application/json"); });
+
+        svr.Get("/transform/rotation", [](const auto &req, auto &res)
+                {
+            auto id = req.get_param_value("id");
+            auto angle_id = req.get_param_value("angle");
+            std::cout << "id=" << id << std::endl;
+            std::cout << "angle=" << angle_id << std::endl;
+            auto angle = std::stod(angle_id);
+            cv::Mat mat = read_image(id);
+            cv::Mat *rotated_mat = rotation(mat,angle);
+            handle_frame(rotated_mat,res);
+        });
+
+        svr.Get("/transform/rotation/save", [](const auto &req, auto &res)
+                {
+            auto id = req.get_param_value("id");
+            auto angle_id = req.get_param_value("angle");
+            std::cout << "id=" << id << std::endl;
+            std::cout << "angle=" << angle_id << std::endl;
+            auto angle = std::stod(angle_id);
+            cv::Mat mat = read_image(id);
+            cv::Mat *rotated_mat = rotation(mat,angle);
+            write_image(id,*rotated_mat);
+            handle_frame(rotated_mat,res);
+        });
+
+        svr.Get("/transform/grey", [](const auto &req, auto &res)
+                {
+            auto id = req.get_param_value("id");
+            std::cout << "id=" << id << std::endl;
+            cv::Mat mat = read_image(id);
+            cv::Mat *rotated_mat = grey(mat);
+            handle_frame(rotated_mat,res);
+         });
+        svr.Get("/transform/grey/save", [](const auto &req, auto &res)
+                {
+            auto id = req.get_param_value("id");
+            std::cout << "id=" << id << std::endl;
+            cv::Mat mat = read_image(id);
+            cv::Mat *rotated_mat = grey(mat);
+            write_image(id,*rotated_mat);
+            handle_frame(rotated_mat,res);
+         });
+
+        svr.Get("/transform/blur", [](const auto &req, auto &res)
+                {
+            auto id = req.get_param_value("id");
+            std::cout << "id=" << id << std::endl;
+            cv::Mat mat = read_image(id);
+            cv::Mat *rotated_mat = blurImage(mat);
+            handle_frame(rotated_mat,res);
+        });
+        svr.Get("/transform/gaussinblur", [](const auto &req, auto &res)
+                {
+            auto id = req.get_param_value("id");
+            auto sigmaX = req.get_param_value("sigmaX");
+            auto sigmaY = req.get_param_value("sigmaY");
+            std::cout << "id=" << id << std::endl;
+            cv::Mat mat = read_image(id);
+            cv::Mat *rotated_mat = gaussinblurImage(mat,std::stod(sigmaX),std::stod(sigmaY));
+            handle_frame(rotated_mat,res);
+        });
 
         svr.set_mount_point("/static", config.static_path);
         svr.start(config.host, config.port);

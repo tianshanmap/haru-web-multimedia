@@ -1,13 +1,8 @@
 web:
   host: "0.0.0.0"
-  port: 8080
+  port: 9082
   static_path: "/Users/developer/Downloads"
-photoes:
-  source: "/Users/developer/T9/travels/processed"
-  export_path: "/Users/developer/T9/workshop/export-photoes-mp4"
-  media_mp3_path: "/Users/developer/T9/workshop/media-mp3"
-  media_mp3_path_export: "/Users/developer/T9/workshop/media-mp3-export"
-  final_photoes_export: "/Users/developer/T9/workshop/final-photoes-mp4"
+  prefix: "/media"
 media:
   audio_path: "/Users/developer/T9/workshop/media-mp3"
   audio_workspace: "/Users/developer/T9/workshop/media-mp3-export"

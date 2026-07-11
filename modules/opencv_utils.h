@@ -10,6 +10,8 @@ namespace haru {
     {
         float vertical_fk[3][3];
     };
+    cv::Mat read_image(std::string &path);
+    void write_image(std::string &path,cv::Mat &frame);
     std::string getVideo();
     std::vector<std::string> split(const std::string &s, char delim);
     std::vector<float> convert(const std::vector<std::string> &input);
@@ -22,7 +24,7 @@ namespace haru {
     cv::Mat *image_filter(cv::Mat &frame, float vertical_fk[3][3]);
     cv::Mat *grey(cv::Mat &frame);
     cv::Mat *blurImage(cv::Mat &frame);
-    cv::Mat *gaussinblurImage(cv::Mat &frame);
+    cv::Mat *gaussinblurImage(cv::Mat &frame,double sigmaX = 0,double sigmaY = 0);
     cv::Mat *styleImage(cv::Mat &frame);
     void sketch(cv::Mat &frame, cv::Mat &greyFrame, cv::Mat &colorFrame, float sigma_s, float sigma_r, float shade_factor);
     cv::Mat *sketchImage(cv::Mat &frame);

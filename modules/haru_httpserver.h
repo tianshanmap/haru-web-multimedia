@@ -8,14 +8,18 @@
 #define HARU_OPENCV_WEB_HARU_HTTPSERVER_H
 namespace haru {
     int webMain(YamlConfig &config);
+    inline std::string urlMapping(YamlConfig &config, const std::string &url) {
+        return config.prefix + url;
+    }
     class HaruHttpServer {
     private:
+        YamlConfig &config;
         httplib::Server *svr;
         std::map<std::string,std::string> mapping;
     public:
-        HaruHttpServer(httplib::Server *svr) {
+        HaruHttpServer(httplib::Server *svr,YamlConfig &config) : config(config) {
             this->svr = svr;
-        };
+        } ;
         void add_mapping(std::string key,std::string value) {
             this->mapping[key] = value;
         }
@@ -23,16 +27,19 @@ namespace haru {
             return this->mapping;
         }
         void Get(const std::string &pattern, std::function<void(const httplib::Request &, httplib::Response &)> handler) {
-            this->svr->Get(pattern, handler);
-            add_mapping(pattern,"GET");
+            std::string key = urlMapping(config,pattern);
+            this->svr->Get(key, handler);
+            add_mapping(key,"GET");
         }
         void Post(const std::string &pattern, std::function<void(const httplib::Request &, httplib::Response &)> handler) {
-            this->svr->Post(pattern, handler);
-            add_mapping(pattern,"POST");
+            std::string key = urlMapping(config,pattern);
+            this->svr->Post(key, handler);
+            add_mapping(key,"POST");
         }
         void Options(const std::string &pattern, std::function<void(const httplib::Request &, httplib::Response &)> handler) {
-            this->svr->Options(pattern, handler);
-            add_mapping(pattern,"OPTIONS");
+            std::string key = urlMapping(config,pattern);
+            this->svr->Options(key, handler);
+            add_mapping(key,"OPTIONS");
         }
         void set_mount_point(std::string &&path, std::string &dir) {
             this->svr->set_mount_point(path, dir);

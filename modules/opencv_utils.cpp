@@ -20,7 +20,13 @@ namespace haru {
         return "/Users/developer/T9/document/seijin/Unfaithful-things.mp4";
         // return "/Users/developer/T9/document/movie/猩疯血雨.mp4";
     }
-
+    cv::Mat read_image(std::string &path) {
+        return cv::imread(path, cv::IMREAD_COLOR);
+    }
+    void write_image(std::string &path,cv::Mat &frame){
+        std::cout << "Write image to file..." << path << std::endl;
+        cv::imwrite(path, frame);
+    }
     std::vector<std::string> split(const std::string &s, char delim)
     {
         std::vector<std::string> result;
@@ -134,15 +140,15 @@ namespace haru {
         // we will save the resulting image in rotated_image matrix
         cv::Mat *image = new cv::Mat();
         // rotate the image using warpAffine
-        cv::blur(frame, *image, cv::Size(3, 3));
+        cv::blur(frame, *image, cv::Size(5, 5));
         return image;
     }
-    cv::Mat *gaussinblurImage(cv::Mat &frame)
+    cv::Mat *gaussinblurImage(cv::Mat &frame,double sigmaX, double sigmaY)
     {
 
         // we will save the resulting image in rotated_image matrix
         cv::Mat *image = new cv::Mat();
-        cv::GaussianBlur(frame, *image, cv::Size(5, 5), 0, 0);
+        cv::GaussianBlur(frame, *image, cv::Size(5, 5), sigmaX, sigmaY);
         return image;
     }
 
