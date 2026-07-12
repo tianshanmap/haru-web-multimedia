@@ -28,12 +28,14 @@ namespace haru {
     cv::Mat *styleImage(cv::Mat &frame);
     void sketch(cv::Mat &frame, cv::Mat &greyFrame, cv::Mat &colorFrame, float sigma_s, float sigma_r, float shade_factor);
     cv::Mat *sketchImage(cv::Mat &frame);
+    std::tuple<cv::Mat *,cv::Mat *> performSketch(cv::Mat &frame);
     cv::Mat *sketchColorImage(cv::Mat &frame);
     cv::Mat *detailEnhanceImage(cv::Mat &frame, float sigma_s, float sigma_r);
-    cv::Mat *medianblurImage(cv::Mat &frame);
-    cv::Mat *bilateralImage(cv::Mat &frame);
+    cv::Mat *medianblurImage(cv::Mat &frame,int ksize=3);
+    cv::Mat *bilateralImage(cv::Mat &frame,int diameter=5,int sigma_color=75,int sigma_space=75);
     cv::Mat *flipImage(cv::Mat &frame, int direction);
-    cv::Mat *normalizeImage(cv::Mat &frame);
+    cv::Mat *normalizeImage(cv::Mat &frame,double alpha=50,double beta=50);
+    cv::Mat *contrastImage(cv::Mat &frame, double alpha = 2.2, int beta = 50);
     void contrastImage(cv::Mat &frame, std::vector<uchar> &buffer, double alpha = 2.2, int beta = 50);
     cv::Mat *edgePreservingImage(cv::Mat &frame,double sigma_s,double sigma_r);
     cv::Mat *readVideo(int index, std::string &filename, std::vector<uchar> &buffer);

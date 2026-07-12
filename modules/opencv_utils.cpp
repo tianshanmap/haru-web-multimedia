@@ -190,6 +190,15 @@ namespace haru {
         // we will save the resulting image in rotated_image matrix
         cv::pencilSketch(frame, greyFrame, colorFrame, sigma_s, sigma_r, shade_factor);
     }
+    std::tuple<cv::Mat *,cv::Mat *> performSketch(cv::Mat &frame)
+    {
+        // we will save the resulting image in rotated_image matrix
+        cv::Mat image;
+        cv::Mat *grey_image = new cv::Mat();
+        cv::Mat *color_image = new cv::Mat();
+        cv::pencilSketch(frame, *grey_image, *color_image);
+        return {grey_image,color_image};
+    }
     cv::Mat *sketchImage(cv::Mat &frame)
     {
 
@@ -232,20 +241,20 @@ namespace haru {
 
         return style_image;
     }
-    cv::Mat *medianblurImage(cv::Mat &frame)
+    cv::Mat *medianblurImage(cv::Mat &frame,int ksize)
     {
 
         // we will save the resulting image in rotated_image matrix
         cv::Mat *image = new cv::Mat();
-        cv::medianBlur(frame, *image, 5);
+        cv::medianBlur(frame, *image, ksize);
         return image;
     }
-    cv::Mat *bilateralImage(cv::Mat &frame)
+    cv::Mat *bilateralImage(cv::Mat &frame,int diameter,int sigma_color,int sigma_space)
     {
-
         // we will save the resulting image in rotated_image matrix
         cv::Mat *image = new cv::Mat();
-        cv::bilateralFilter(frame, *image, 9, 75, 75);
+        // cv::bilateralFilter(frame, *image, 9, 75, 75);
+        cv::bilateralFilter(frame, *image, diameter, sigma_color,sigma_space);
         return image;
     }
 
@@ -259,13 +268,13 @@ namespace haru {
         return image;
     }
 
-    cv::Mat *normalizeImage(cv::Mat &frame)
+    cv::Mat *normalizeImage(cv::Mat &frame,double alpha,double beta)
     {
 
         // we will save the resulting image in rotated_image matrix
         cv::Mat *image = new cv::Mat();
         // rotate the image using warpAffine
-        cv::normalize(frame, *image, 20, 50, cv::NORM_MINMAX, -1, cv::noArray());
+        cv::normalize(frame, *image, alpha, beta, cv::NORM_MINMAX, -1, cv::noArray());
         return image;
     }
     /*
@@ -290,6 +299,13 @@ namespace haru {
         cv::Mat image;
         frame.convertTo(image, -1, alpha, beta);
         convertImage(image, buffer);
+    }
+    cv::Mat *contrastImage(cv::Mat &frame, double alpha, int beta)
+    {
+        // we will save the resulting image in rotated_image matrix
+        cv::Mat *image = new cv::Mat();
+        frame.convertTo(*image, -1, alpha, beta);
+        return image;
     }
 
     /*

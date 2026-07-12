@@ -2,6 +2,7 @@
 // Created by developer on 2026-05-27.
 //
 #include "../include/httplib.hpp"
+#include "haru_yaml.h"
 #include <simplelogger/simple_logger.hpp>
 
 #ifndef HARU_OPENCV_WEB_HARU_HTTPSERVER_H
@@ -27,6 +28,8 @@ namespace haru {
             return this->mapping;
         }
         void Get(const std::string &pattern, std::function<void(const httplib::Request &, httplib::Response &)> handler) {
+            SimpleLogger &logger = SimpleLogger::getInstance();
+            logger.info("Register GET::" + pattern);
             std::string key = urlMapping(config,pattern);
             this->svr->Get(key, handler);
             add_mapping(key,"GET");

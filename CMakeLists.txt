@@ -64,6 +64,8 @@ add_executable(web-multimedia
         modules/haru_http_handlers.h
         modules/haru_service.cpp
         modules/haru_service.h
+        modules/HaruRouter.cpp
+        modules/HaruRouter.h
 )
 
 # 3. Link OpenCV libraries to your executable
