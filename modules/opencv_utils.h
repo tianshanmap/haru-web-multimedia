@@ -25,10 +25,10 @@ namespace haru {
     cv::Mat *grey(cv::Mat &frame);
     cv::Mat *blurImage(cv::Mat &frame);
     cv::Mat *gaussinblurImage(cv::Mat &frame,double sigmaX = 0,double sigmaY = 0);
-    cv::Mat *styleImage(cv::Mat &frame);
+    cv::Mat *styleImage(cv::Mat &frame,double sigmaS=60,double sigmaR=0.07);
     void sketch(cv::Mat &frame, cv::Mat &greyFrame, cv::Mat &colorFrame, float sigma_s, float sigma_r, float shade_factor);
-    cv::Mat *sketchImage(cv::Mat &frame);
-    std::tuple<cv::Mat *,cv::Mat *> performSketch(cv::Mat &frame);
+    std::tuple<cv::Mat *,cv::Mat *> performSketch(cv::Mat &frame,double sigmaS, double sigmaR,double shadeFactor);
+    cv::Mat *sketchImage(cv::Mat &frame,double sigmaS=0,double sigmaR=0,double shade_factor=0);
     cv::Mat *sketchColorImage(cv::Mat &frame);
     cv::Mat *detailEnhanceImage(cv::Mat &frame, float sigma_s, float sigma_r);
     cv::Mat *medianblurImage(cv::Mat &frame,int ksize=3);
@@ -51,5 +51,6 @@ namespace haru {
     void load_video(std::string filename,std::filesystem::path parent_path);
     void combine_image(std::string &filename1,std::string &filename2);
     void combine_overlay(std::string &filename1,std::string &filename2);
+    cv::Mat* greyscale(cv::Mat& src, double alpha_blue=0.114,double alpha_green=0.587,double alpha_red=0.299);
 }
 #endif //HARU_OPENCV_WEB_OPENCV_UTILS_H

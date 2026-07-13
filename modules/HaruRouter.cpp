@@ -64,6 +64,16 @@ namespace haru {
             cv::Mat *rotated_mat = grey(mat);
             handle_frame(rotated_mat,res);
          });
+        this->srv.Get("/transform/greyscale", [](const auto &req, auto &res)
+                {
+            auto id = req.get_param_value("id");
+            auto alpha_blue = req.get_param_value("alphaBlue");
+            auto alpha_green = req.get_param_value("alphaGreen");
+            auto alpha_red = req.get_param_value("alphaRed");
+            cv::Mat mat = read_image(id);
+            cv::Mat *rotated_mat = greyscale(mat,std::stod(alpha_blue),std::stod(alpha_green),std::stod(alpha_red));
+            handle_frame(rotated_mat,res);
+         });
         this->srv.Get("/transform/grey/save", [](const auto &req, auto &res)
                 {
             auto id = req.get_param_value("id");
@@ -80,6 +90,16 @@ namespace haru {
             std::cout << "id=" << id << std::endl;
             cv::Mat mat = read_image(id);
             cv::Mat *rotated_mat = blurImage(mat);
+            handle_frame(rotated_mat,res);
+        });
+        this->srv.Get("/transform/style", [](const auto &req, auto &res)
+                {
+            auto id = req.get_param_value("id");
+            auto sigmaS = req.get_param_value("sigmaS");
+            auto sigmaR = req.get_param_value("sigmaR");
+            std::cout << "id=" << id << std::endl;
+            cv::Mat mat = read_image(id);
+            cv::Mat *rotated_mat = styleImage(mat,std::stod(sigmaS),std::stod(sigmaR));
             handle_frame(rotated_mat,res);
         });
         this->srv.Get("/transform/gaussinblur", [](const auto &req, auto &res)
@@ -142,10 +162,13 @@ namespace haru {
                 {
             auto id = req.get_param_value("id");
             auto kind = req.get_param_value("kind");
+            auto sigmaS = req.get_param_value("sigmaS");
+            auto sigmaR = req.get_param_value("sigmaR");
+            auto shadeFactor = req.get_param_value("shadeFactor");
             cv::Mat mat = read_image(id);
             cv::Mat *grey_mat;
             cv::Mat *color_mat;
-            std::tie(grey_mat,color_mat) = performSketch(mat);
+            std::tie(grey_mat,color_mat) = performSketch(mat,std::stod(sigmaS),std::stod(sigmaR),std::stod(shadeFactor));
             if (kind == "grey") {
                 handle_frame(grey_mat,res);
                 delete color_mat;

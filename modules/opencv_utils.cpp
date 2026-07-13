@@ -163,14 +163,14 @@ namespace haru {
         sigma_s	Range between 0 to 200.
         sigma_r	Range between 0 to 1.
     */
-    cv::Mat *styleImage(cv::Mat &frame)
+    cv::Mat *styleImage(cv::Mat &frame,double sigmaS,double sigmaR)
     {
 
         // we will save the resulting image in rotated_image matrix
         cv::Mat image;
         cv::Mat *style_image = new cv::Mat();
         cv::GaussianBlur(frame, image, cv::Size(5, 5), 0, 0);
-        cv::stylization(image, *style_image, 5, 0.1);
+        cv::stylization(image, *style_image, sigmaS, sigmaR);
         return style_image;
     }
 
@@ -190,23 +190,23 @@ namespace haru {
         // we will save the resulting image in rotated_image matrix
         cv::pencilSketch(frame, greyFrame, colorFrame, sigma_s, sigma_r, shade_factor);
     }
-    std::tuple<cv::Mat *,cv::Mat *> performSketch(cv::Mat &frame)
+    std::tuple<cv::Mat *,cv::Mat *> performSketch(cv::Mat &frame,double sigmaS, double sigmaR,double shadeFactor)
     {
         // we will save the resulting image in rotated_image matrix
         cv::Mat image;
         cv::Mat *grey_image = new cv::Mat();
         cv::Mat *color_image = new cv::Mat();
-        cv::pencilSketch(frame, *grey_image, *color_image);
+        cv::pencilSketch(frame, *grey_image, *color_image, sigmaS, sigmaR, shadeFactor);
         return {grey_image,color_image};
     }
-    cv::Mat *sketchImage(cv::Mat &frame)
+    cv::Mat *sketchImage(cv::Mat &frame,double sigmaS, double sigmaR,double shadeFactor)
     {
 
         // we will save the resulting image in rotated_image matrix
         cv::Mat image;
         cv::Mat *style_image = new cv::Mat();
         cv::Mat image1;
-        cv::pencilSketch(frame, *style_image, image1);
+        cv::pencilSketch(frame, *style_image, image1, sigmaS, sigmaR, shadeFactor);
         return style_image;
     }
     cv::Mat *sketchColorImage(cv::Mat &frame)
@@ -796,6 +796,30 @@ namespace haru {
             return;
         }
         combine_overlay(img1,img2);
+    }
+    cv::Mat* greyscale(cv::Mat& src,double alpha_blue,double alpha_green,double alpha_red) {
+        if (src.empty()) {
+            return nullptr;
+        }
+        cv::Mat* dst = new cv::Mat(src.rows,src.cols,src.type());
+        for (int i = 0; i < src.rows; i++) {
+            cv::Vec3b* srcPtr = src.ptr<cv::Vec3b>(i);
+            cv::Vec3b* dstPtr = (*dst).ptr<cv::Vec3b>(i);
+
+            for (int j = 0; j < src.cols; j++) {
+                uchar blue = srcPtr[j][0];
+                uchar green = srcPtr[j][1];
+                uchar red = srcPtr[j][2];
+
+                // uchar grey = (uchar)(0.2 * blue + 0.187 * green + 0.89 * red);
+                uchar grey = (uchar)(alpha_blue * blue + alpha_green * green + alpha_red * red);
+
+                dstPtr[j][0] = (uchar)blue*alpha_blue;
+                dstPtr[j][1] = (uchar)green*alpha_green;
+                dstPtr[j][2] = (uchar)red*alpha_red;
+            }
+        }
+        return dst;
     }
 }
 //
