@@ -246,6 +246,56 @@ namespace haru {
             // Allow requests from any frontend origin
             res.set_header("Access-Control-Allow-Origin", "*");
             res.set_content(response, "application/json"); });
+        this->srv.Get("/video/play", [](const httplib::Request& req, httplib::Response& res) {
+            // std::string file_path = "/Users/developer/Documents/book/movie/2030_trailer.mp4";
+            auto file_path = req.get_param_value("id");
+            // Use a shared pointer to keep the file open during streaming
+            auto file = std::make_shared<std::ifstream>(file_path, std::ios::binary);
+            if (!file->is_open()) {
+                res.status = 404;
+                return;
+            }
 
+            // Set content-type and content-length
+            file->seekg(0, std::ios::end);
+            auto file_size = file->tellg();
+            file->seekg(0, std::ios::beg);
+
+            res.set_header("Access-Control-Allow-Origin", "*");
+            res.set_content_provider(
+                file_size,
+                "video/mp4",
+                [file](size_t offset, size_t length, httplib::DataSink &sink) {
+                    file->seekg(offset);
+                    std::vector<char> buffer(length);
+                    file->read(buffer.data(), length);
+                    sink.write(buffer.data(), file->gcount());
+                    return true;
+                }
+            );
+        });
+        this->srv.Post("/video/capture", [config](const auto &req, auto &res)
+                {
+            if (req.has_header("Content-Type") && req.get_header_value("Content-Type") != "application/json") {
+                res.status = 400;
+                res.set_content(R"({"error": "Content-Type must be application/json"})", "application/json");
+                return;
+            }
+            VideoCaptureRequest video_capture_request = get_video_capture_request(req);
+            std::cout << "payload:" << video_capture_request.payload << std::endl;
+            std::cout << "filename:" << video_capture_request.filename << std::endl;
+            std::string prefix = "data:image/jpeg;base64,";
+            if (video_capture_request.payload.compare(0, prefix.length(), prefix) == 0) {
+                video_capture_request.payload.erase(0, prefix.length());
+            }
+            std::vector<unsigned char> image_bytes = base64_decode(video_capture_request.payload);
+            std::ofstream outfile(video_capture_request.filename, std::ios::out | std::ios::binary);
+            if (outfile.is_open()) {
+                outfile.write(reinterpret_cast<const char*>(image_bytes.data()), image_bytes.size());
+                outfile.close();
+            }
+            std::string response = get_common_response();
+            res.set_header("Access-Control-Allow-Origin", "*");
+            res.set_content(response, "application/json"); });
     }
 }

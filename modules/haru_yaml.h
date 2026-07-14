@@ -17,6 +17,7 @@ namespace haru {
         std::string media_audio_path;
         std::string media_audio_workspace;
         std::string media_video_export;
+        std::string media_video_capture;
         std::string upload_target_path;
         int upload_max_size;
         void load_yaml() {
@@ -34,6 +35,7 @@ namespace haru {
                     media_audio_path = config["media"]["audio_path"].as<std::string>();
                     media_audio_workspace = config["media"]["audio_workspace"].as<std::string>();
                     media_video_export = config["media"]["video_export"].as<std::string>();
+                    media_video_capture = config["media"]["video_capture"].as<std::string>();
                 }
                 if (config["upload"]) {
                     upload_target_path = config["upload"]["target_path"].as<std::string>();

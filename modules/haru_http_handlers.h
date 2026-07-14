@@ -14,6 +14,10 @@ namespace haru {
     AudioCreateRequest get_audio_create_request(const httplib::Request &req);
     std::string get_audio_create_response(AudioCreateResponse &response);
     std::string get_upload_target_path(const YamlConfig &config);
+    VideoCaptureRequest get_video_capture_request(const httplib::Request &req);
+    std::string get_common_response();
+    std::string get_path_response(std::string path);
+    std::vector<unsigned char> base64_decode(const std::string& in);
 };
 
 #endif //HARU_OPENCV_WEB_HARU_HTTP_HANDLERS_H

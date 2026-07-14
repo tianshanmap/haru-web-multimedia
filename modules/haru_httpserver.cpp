@@ -463,6 +463,13 @@ namespace haru {
             res.set_header("Access-Control-Allow-Origin", "*");
             res.set_content(s, "application/json"); });
 
+        svr.Get("/filesystem/video/capture", [config](const auto &req, auto &res)
+                {
+            // Allow requests from any frontend origin
+            std::string s = get_path_response(config.media_video_capture);
+            res.set_header("Access-Control-Allow-Origin", "*");
+            res.set_content(s, "application/json"); });
+
         svr.set_mount_point("/static", config.static_path);
         svr.start(config.host, config.port);
         return 0; // Returning 0 indicates the program finished successfully

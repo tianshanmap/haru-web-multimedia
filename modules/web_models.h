@@ -27,6 +27,10 @@ namespace haru {
         std::string video_name;
         std::vector<std::string> image_files;
     };
+    struct VideoCaptureRequest {
+        std::string filename;
+        std::string payload;
+    };
     struct TextSaveRequest {
         std::string file_path;
         std::string content;
