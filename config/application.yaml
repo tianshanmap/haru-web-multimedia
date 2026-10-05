@@ -8,6 +8,7 @@ media:
   audio_workspace: "/Users/developer/T9/workshop/media-mp3-export"
   video_export: "/Users/developer/T9/workshop/final-photoes-mp4"
   video_capture: "/Users/developer/T9/workshop/video-capture"
+  video_home: "/Users/developer/T9/document/seijin"
 upload:
   max_size: 104857600
   max_files: 10

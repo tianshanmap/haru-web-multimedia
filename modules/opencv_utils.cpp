@@ -821,6 +821,24 @@ namespace haru {
         }
         return dst;
     }
+    int resize_image(std::string &filepath,double scale_factor) {
+        // Load the original image
+        cv::Mat original_image = cv::imread(filepath);
+        if (original_image.empty()) {
+            std::cerr << "Could not open or find the image!" << std::endl;
+            return -1;
+        }
+
+        // Set the new dimensions (e.g., 50% of the original size)
+        cv::Mat resized_image;
+        // cv::INTER_AREA is highly recommended for shrinking/downsampling images
+        cv::resize(original_image, resized_image, cv::Size(), scale_factor, scale_factor, cv::INTER_AREA);
+
+        // Save the smaller image
+        cv::imwrite("resized_output.jpg", resized_image);
+
+        return 0;
+    }
 }
 //
 // Created by developer on 2026-05-19.
