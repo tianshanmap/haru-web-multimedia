@@ -1,17 +1,16 @@
 web:
   host: "0.0.0.0"
   port: 9082
-  static_path: "/Users/developer/Downloads"
+  static_path: "workshop/static"
   prefix: "/media"
 media:
-  audio_path: "/Users/developer/T9/workshop/media-mp3"
-  audio_workspace: "/Users/developer/T9/workshop/media-mp3-export"
-  video_export: "/Users/developer/T9/workshop/final-photoes-mp4"
-  video_capture: "/Users/developer/T9/workshop/video-capture"
-  video_home: "/Users/developer/T9/document/seijin"
+  audio_path: "workshop/media-mp3"
+  audio_workspace: "workshop/media-mp3-export"
+  video_export: "workshop/final-photoes-mp4"
+  video_capture: "workshop/video-capture"
 upload:
   max_size: 104857600
   max_files: 10
   max_file_size: 104857600
   max_file_size_name: 100
-  target_path: "/Users/developer/T9/workshop/uploads"
+  target_path: "workshop/uploads"

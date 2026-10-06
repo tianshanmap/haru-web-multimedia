@@ -10,4 +10,3 @@ cmake --install build --prefix ./install
 #mkdir bin/
 #cp build/web-multimedia bin/
 cp config/* install/bin/
-

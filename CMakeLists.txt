@@ -90,6 +90,22 @@ endif()
 install(TARGETS web-multimedia
         RUNTIME DESTINATION bin  # Installs the app to the 'bin' folder
 )
+#install(CODE [[
+#    file(GET_RUNTIME_DEPENDENCIES
+#        EXECUTABLES $<TARGET_FILE:web-multimedia>
+#        RESOLVED_DEPENDENCIES_VAR resolved_deps
+#        UNRESOLVED_DEPENDENCIES_VAR unresolved_deps
+#        # Exclude standard system and kernel libraries so we only grab OpenCV/third-party libs
+#        PRE_EXCLUDE_REGEXES "^/lib" "^/usr/lib" "^/System" "^/usr/lib/system"
+#    )
+#    foreach(file ${resolved_deps})
+#        # Filter to ensure we are only copying OpenCV libraries
+#        if(file MATCHES "opencv")
+#            message(STATUS "Bundling dependency: ${file}")
+#            file(INSTALL ${file} DESTINATION "${CMAKE_INSTALL_PREFIX}/lib")
+#        endif()
+#    endforeach()
+#]])
 install(TARGETS haru_ffmpeg
         EXPORT web-multimedia
         LIBRARY DESTINATION lib
