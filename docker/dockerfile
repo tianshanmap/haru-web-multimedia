@@ -1,0 +1,39 @@
+FROM ubuntu:latest
+
+# Prevent interactive prompts during apt-get
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Update and install build tools, CMake, GCC/G++, FFmpeg, and OpenCV dev packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    cmake \
+    gdb \
+    wget \
+    git \
+    pkg-config \
+    ffmpeg \
+    libopencv-dev \
+    libavformat-dev \
+    libavcodec-dev \
+    libswscale-dev \
+    libavutil-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install -y ca-certificates
+
+# Set working directory
+WORKDIR /app
+COPY include /app/workspace/include
+COPY config /app/workspace/config
+COPY modules /app/workspace/modules
+COPY CMakeLists.txt /app/workspace
+COPY *.sh /app/workspace
+COPY *.cpp /app/workspace
+
+# Build the c++ applications
+WORKDIR /app/workspace
+RUN ./fresh-build.sh
+RUN mv bin/* ../
+WORKDIR /app
+# Default command to start a bash shell
+CMD ["/bin/bash"]
