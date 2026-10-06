@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM ubuntu:latest AS builder
 
 # Prevent interactive prompts during apt-get
 ENV DEBIAN_FRONTEND=noninteractive
@@ -33,7 +33,11 @@ COPY *.cpp /app/workspace
 # Build the c++ applications
 WORKDIR /app/workspace
 RUN ./fresh-build.sh
-RUN mv bin/* ../
+# RUN mv bin/* ../
 WORKDIR /app
+
+# FROM ubuntu:latest
+# WORKDIR /app
+# COPY --from=build /app/* /app
 # Default command to start a bash shell
 CMD ["/bin/bash"]

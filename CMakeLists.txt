@@ -5,7 +5,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_OSX_DEPLOYMENT_TARGET 26.0)
-
 # project name and language
 project(web-multimedia LANGUAGES CXX)
 
@@ -71,3 +70,41 @@ add_executable(web-multimedia
 # 3. Link OpenCV libraries to your executable
 target_link_libraries(web-multimedia ${OpenCV_LIBS} yaml-cpp::yaml-cpp simplelogger file_utils haru_ffmpeg)
 target_include_directories(web-multimedia PRIVATE ${OpenCV_INCLUDE_DIRS})
+# Assuming your main executable target is named "web-multimedia"
+if(APPLE)
+    # macOS Setup
+    message(STATUS "On Mac...")
+    set_target_properties(web-multimedia PROPERTIES
+            MACOSX_RPATH TRUE
+            INSTALL_RPATH "@loader_path/../lib;/opt/homebrew/lib"
+    )
+else()
+    # Linux (Ubuntu) Setup
+    message(STATUS "On Linux...")
+    set_target_properties(web-multimedia PROPERTIES
+            # Note the escaped \\$ORIGIN so CMake treats it as a literal string for the linker
+            INSTALL_RPATH "$ORIGIN/../lib:/opt/homebrew/lib"
+    )
+endif()
+
+install(TARGETS web-multimedia
+        RUNTIME DESTINATION bin  # Installs the app to the 'bin' folder
+)
+install(TARGETS haru_ffmpeg
+        EXPORT web-multimedia
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin
+)
+install(TARGETS simplelogger
+        EXPORT web-multimedia
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin
+)
+install(TARGETS file_utils
+        EXPORT web-multimedia
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin
+)
