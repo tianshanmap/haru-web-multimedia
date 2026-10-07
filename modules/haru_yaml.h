@@ -7,6 +7,9 @@
 #include <filesystem>
 #include <iostream>
 #include <yaml-cpp/yaml.h>
+
+#include "simplelogger/simple_logger.hpp"
+
 namespace haru {
     struct YamlConfig {
         std::string yaml_path;
@@ -22,7 +25,9 @@ namespace haru {
         std::string upload_target_path;
         int upload_max_size;
         std::string get_path(std::string&& path) {
+            SimpleLogger &logger = SimpleLogger::getInstance();
             std::filesystem::path file_path = path;
+            logger.info("haru_yaml.h::get_path::path",path);
             if (file_path.is_absolute()) {
                 return path;
             } else {
@@ -31,7 +36,8 @@ namespace haru {
                     std::filesystem::path current_path = std::filesystem::current_path();
                     std::filesystem::path fullPath = current_path / path;
                     std::filesystem::create_directories(fullPath);
-                    return current_path;
+                    logger.info("haru_yaml.h::get_path::fullPath",fullPath);
+                    return fullPath;
                 } catch (const std::filesystem::filesystem_error& e) {
                     std::cerr << "Error detecting directory: " << e.what() << std::endl;
                 }

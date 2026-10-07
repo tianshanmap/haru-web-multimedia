@@ -1,6 +1,6 @@
 web:
   host: "0.0.0.0"
-  port: 9082
+  port: 8080
   static_path: "workshop/static"
   prefix: "/media"
 media:

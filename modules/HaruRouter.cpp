@@ -203,8 +203,11 @@ namespace haru {
             res.set_content(get_upload_target_path(config), content_type); });
         this->srv.Get("/filesystem/video/audio_list", [config](const auto &req, auto &res)
                 {
+            SimpleLogger &logger = SimpleLogger::getInstance();
             std::string audio_path = config.media_audio_path;
+            logger.info("/filesystem/video/audio_list audio_path",audio_path,"...");
             std::string s = get_audio_as_json(audio_path);
+            logger.info("/filesystem/video/audio_list audio_path_response",s,"...");
             // Allow requests from any frontend origin
             res.set_header("Access-Control-Allow-Origin", "*");
             res.set_content(s, "application/json"); });

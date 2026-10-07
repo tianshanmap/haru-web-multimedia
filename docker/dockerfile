@@ -1,5 +1,5 @@
 FROM ubuntu:latest AS builder
-
+ARG AUDIO_PATH=/Users/developer/T9/workshop/media-mp3
 # Prevent interactive prompts during apt-get
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -50,7 +50,8 @@ WORKDIR /app
 # COPY --from=builder /app/workspace/install/bin /app/bin
 RUN cp -rf /app/workspace/install/* /app
 RUN rm -rf /app/workspace
-# COPY /app/workspace/install/bin /app/lib
-
+# COPY workshop/media-mp3 /app/workshop/media-mp3
+EXPOSE 8080
 # Default command to start a bash shell
-CMD ["/bin/bash"]
+# CMD ["/bin/bash"]
+CMD ["/app/bin/web-multimedia", "/app/bin/application.yaml"]
